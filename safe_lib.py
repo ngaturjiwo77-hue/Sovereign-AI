@@ -17,7 +17,7 @@ class SafeOS:
         if path.startswith('/') and any(f in path for f in SafeOS.FORBIDDEN_PATHS):
             raise ValueError(f"Forbidden absolute path: {path}")
         # Gunakan built-in open agar mengembalikan file object
-        return _os.fdopen(_os.open(path, _os.O_RDONLY if 'r' in mode else _os.O_WRONLY | _os.O_CREAT), mode, *args, **kwargs)
+        return open(path, mode, *args, **kwargs)
 
     @staticmethod
     def system(cmd):

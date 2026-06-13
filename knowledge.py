@@ -31,3 +31,8 @@ class KnowledgeBase:
             pass
 
     # ... (tambahkan fungsi lainnya seperti learn_from_code dan get_safe_template sesuai aslinya)
+
+    def learn_from_code(self, code, lang, anchors, voids):
+        pattern_id = str(hash(code) % 10000)
+        self.data["patterns"][pattern_id] = {"lang": lang, "anchors": anchors, "voids": voids}
+        self.data["total_learned"] += 1
