@@ -1,30 +1,9 @@
 from kivy.app import App
-from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
-from kivy.clock import Clock
-import sys
-import os
-sys.path.insert(0, '.')
 
-class SovereignApp(App):
+class TestApp(App):
     def build(self):
-        # Layar loading sementara
-        self.layout = BoxLayout(orientation='vertical', padding=20)
-        self.label = Label(text="Inisialisasi Sovereign AI...")
-        self.layout.add_widget(self.label)
-        
-        # Inisialisasi AI setelah UI ter-render (0.5 detik)
-        Clock.schedule_once(self.load_ai, 0.5)
-        return self.layout
-
-    def load_ai(self, dt):
-        try:
-            from sovereign_ai import SovereignAI
-            self.ai = SovereignAI()
-            self.label.text = "Sistem Aktif."
-            # Di sini nanti kamu bisa tambahkan fungsi untuk mengganti UI
-        except Exception as e:
-            self.label.text = f"Error: {str(e)}"
+        return Label(text="Hello Android!")
 
 if __name__ == '__main__':
-    SovereignApp().run()
+    TestApp().run()
