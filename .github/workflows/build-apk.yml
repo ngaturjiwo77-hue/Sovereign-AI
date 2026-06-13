@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
 
@@ -19,7 +19,7 @@ jobs:
       - name: Install Buildozer & deps
         run: |
           sudo apt update
-          sudo apt install -y python3-pip python3-dev zip unzip openjdk-17-jdk zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake autoconf libtool libffi-dev
+          sudo apt install -y python3-pip python3-dev zip unzip openjdk-17-jdk zlib1g-dev libncurses-dev cmake autoconf libtool libffi-dev
           pip install buildozer cython==0.29.33
 
       - name: Build APK
