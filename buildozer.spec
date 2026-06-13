@@ -6,7 +6,7 @@ package.domain = org.logic
 source.dir = .
 source.include_exts = py,png,jpg,json,txt
 version = 1.0
-requirements = python3,kivy==master==master
+requirements = python3,kivy==master
 orientation = portrait
 fullscreen = 1
 android.permissions = INTERNET,READ_EXTERNAL_STORAGE,WRITE_EXTERNAL_STORAGE
