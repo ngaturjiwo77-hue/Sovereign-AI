@@ -6,7 +6,7 @@ package.domain = org.logic
 source.dir = .
 source.include_exts = py,png,jpg,json,txt
 version = 1.0
-requirements = python3,kivy==master
+requirements = python3,kivy==2.3.0
 orientation = portrait
 fullscreen = 1
 android.permissions = INTERNET,READ_EXTERNAL_STORAGE,WRITE_EXTERNAL_STORAGE
@@ -19,4 +19,3 @@ android.accept_sdk_license = True
 [buildozer]
 log_level = 2
 show_progress = 1
-p4a.branch = develop
