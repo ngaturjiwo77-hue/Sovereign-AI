@@ -15,6 +15,7 @@ jobs:
 
       - name: Build APK
         run: |
+          export BUILD_ALLOW_ROOT=1
           buildozer android debug
 
       - name: Upload APK
