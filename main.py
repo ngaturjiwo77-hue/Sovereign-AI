@@ -4,7 +4,6 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.spinner import Spinner
-from kivy.uix.scrollview import ScrollView
 from kivy.clock import Clock
 from kivy.utils import platform
 import threading
@@ -14,21 +13,12 @@ import traceback
 class SovereignApp(App):
     def build(self):
         try:
-            # 1. Minta Izin Dulu
-            if platform == 'android':
-                from android.permissions import request_permissions, Permission
-                request_permissions([
-                    Permission.READ_EXTERNAL_STORAGE, 
-                    Permission.WRITE_EXTERNAL_STORAGE,
-                    Permission.INTERNET
-                ])
-
-            # 2. Muat AI-nya
+            # 1. Muat AI-nya
             sys.path.insert(0, '.')
             from sovereign_ai import SovereignAI
             self.ai = SovereignAI()
             
-            # 3. Bangun UI
+            # 2. Bangun UI
             layout = BoxLayout(orientation='vertical', padding=10, spacing=8)
             layout.add_widget(Label(text='SOVEREIGN AI', font_size=24, bold=True, size_hint=(1, 0.05), color=(0, 1, 0.2, 1)))
             
@@ -48,13 +38,25 @@ class SovereignApp(App):
             return layout
 
         except Exception as e:
-            # JIKA TERJADI CRASH, TAMPILKAN DI LAYAR!
             error_msg = traceback.format_exc()
             layout = BoxLayout(orientation='vertical', padding=10)
             layout.add_widget(Label(text='CRASH REPORT', color=(1, 0, 0, 1), size_hint=(1, 0.1), bold=True))
             error_box = TextInput(text=error_msg, readonly=True, foreground_color=(1, 0, 0, 1))
             layout.add_widget(error_box)
             return layout
+
+    def on_start(self):
+        # Minta izin SETELAH layar muncul agar Android tidak panik
+        if platform == 'android':
+            try:
+                from android.permissions import request_permissions, Permission
+                request_permissions([
+                    Permission.READ_EXTERNAL_STORAGE, 
+                    Permission.WRITE_EXTERNAL_STORAGE,
+                    Permission.INTERNET
+                ])
+            except Exception as e:
+                self.output.text = f"Error Izin: {str(e)}"
 
     def jalankan_tugas(self, instance):
         self.output.text = 'Processing...'
@@ -78,7 +80,8 @@ class SovereignApp(App):
                     hasil = self.ai.kristalisasi_niat('exploit', data)
                     Clock.schedule_once(lambda dt: setattr(self.output, 'text', f'Payload: {len(hasil)}'))
             except Exception as e:
-                Clock.schedule_once(lambda dt: setattr(self.output, 'text', f'Error: {str(e)}'))
+                error_msg = traceback.format_exc()
+                Clock.schedule_once(lambda dt: setattr(self.output, 'text', f'ERROR:\n{error_msg}'))
         threading.Thread(target=task, daemon=True).start()
 
 if __name__ == '__main__':
