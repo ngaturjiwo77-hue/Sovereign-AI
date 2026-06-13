@@ -6,6 +6,7 @@ from kivy.uix.label import Label
 from kivy.uix.spinner import Spinner
 from kivy.uix.scrollview import ScrollView
 from kivy.clock import Clock
+from kivy.utils import platform  # TAMBAHKAN INI: Untuk mendeteksi Android
 import threading
 import sys
 sys.path.insert(0, '.')
@@ -13,11 +14,25 @@ from sovereign_ai import SovereignAI
 
 class SovereignApp(App):
     def build(self):
+        # ==========================================
+        # TAMBAHKAN BLOK INI UNTUK IZIN ANDROID
+        # ==========================================
+        if platform == 'android':
+            from android.permissions import request_permissions, Permission
+            request_permissions([
+                Permission.READ_EXTERNAL_STORAGE, 
+                Permission.WRITE_EXTERNAL_STORAGE,
+                Permission.INTERNET
+            ])
+        # ==========================================
+
         self.ai = SovereignAI()
         layout = BoxLayout(orientation='vertical', padding=10, spacing=8)
         
         # Title
         layout.add_widget(Label(text='SOVEREIGN AI', font_size=24, bold=True, size_hint=(1, 0.05), color=(0, 1, 0.2, 1)))
+        
+        # ... (sisa kode layout kamu di bawahnya tetap sama) ...
         
         # Mode selector
         self.mode = Spinner(text='Audit Kode', values=['Audit Kode', 'Review Kode', 'Scan Folder', 'Create Code', 'Kristalisasi'], size_hint=(1, 0.06))
