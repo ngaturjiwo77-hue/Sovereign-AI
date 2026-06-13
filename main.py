@@ -6,57 +6,57 @@ from kivy.uix.label import Label
 from kivy.uix.spinner import Spinner
 from kivy.uix.scrollview import ScrollView
 from kivy.clock import Clock
-from kivy.utils import platform  # TAMBAHKAN INI: Untuk mendeteksi Android
+from kivy.utils import platform
 import threading
 import sys
-sys.path.insert(0, '.')
-from sovereign_ai import SovereignAI
+import traceback
 
 class SovereignApp(App):
     def build(self):
-        # ==========================================
-        # TAMBAHKAN BLOK INI UNTUK IZIN ANDROID
-        # ==========================================
-        if platform == 'android':
-            from android.permissions import request_permissions, Permission
-            request_permissions([
-                Permission.READ_EXTERNAL_STORAGE, 
-                Permission.WRITE_EXTERNAL_STORAGE,
-                Permission.INTERNET
-            ])
-        # ==========================================
+        try:
+            # 1. Minta Izin Dulu
+            if platform == 'android':
+                from android.permissions import request_permissions, Permission
+                request_permissions([
+                    Permission.READ_EXTERNAL_STORAGE, 
+                    Permission.WRITE_EXTERNAL_STORAGE,
+                    Permission.INTERNET
+                ])
 
-        self.ai = SovereignAI()
-        layout = BoxLayout(orientation='vertical', padding=10, spacing=8)
-        
-        # Title
-        layout.add_widget(Label(text='SOVEREIGN AI', font_size=24, bold=True, size_hint=(1, 0.05), color=(0, 1, 0.2, 1)))
-        
-        # ... (sisa kode layout kamu di bawahnya tetap sama) ...
-        
-        # Mode selector
-        self.mode = Spinner(text='Audit Kode', values=['Audit Kode', 'Review Kode', 'Scan Folder', 'Create Code', 'Kristalisasi'], size_hint=(1, 0.06))
-        layout.add_widget(self.mode)
-        
-        # Input
-        self.input = TextInput(hint_text='Tempel kode atau path folder di sini...', size_hint=(1, 0.4), background_color=(0.05, 0.05, 0.05, 1), foreground_color=(0, 1, 0.2, 1))
-        layout.add_widget(self.input)
-        
-        # Run button
-        btn = Button(text='▶ JALANKAN', size_hint=(1, 0.06), background_color=(0, 0.8, 0.2, 1))
-        btn.bind(on_press=self.run)
-        layout.add_widget(btn)
-        
-        # Output
-        self.output = Label(text='[Output muncul di sini]', size_hint=(1, 0.4), halign='left', valign='top', color=(0, 1, 0.2, 1))
-        self.output.bind(size=self.output.setter('text_size'))
-        scroll = ScrollView(size_hint=(1, 0.4))
-        scroll.add_widget(self.output)
-        layout.add_widget(scroll)
-        
-        return layout
-    
-    def run(self, instance):
+            # 2. Muat AI-nya
+            sys.path.insert(0, '.')
+            from sovereign_ai import SovereignAI
+            self.ai = SovereignAI()
+            
+            # 3. Bangun UI
+            layout = BoxLayout(orientation='vertical', padding=10, spacing=8)
+            layout.add_widget(Label(text='SOVEREIGN AI', font_size=24, bold=True, size_hint=(1, 0.05), color=(0, 1, 0.2, 1)))
+            
+            self.mode = Spinner(text='Audit Kode', values=['Audit Kode', 'Review Kode', 'Scan Folder', 'Create Code', 'Kristalisasi'], size_hint=(1, 0.06))
+            layout.add_widget(self.mode)
+            
+            self.input = TextInput(hint_text='Tempel kode atau path folder di sini...', size_hint=(1, 0.4), background_color=(0.05, 0.05, 0.05, 1), foreground_color=(0, 1, 0.2, 1))
+            layout.add_widget(self.input)
+            
+            btn = Button(text='▶ JALANKAN', size_hint=(1, 0.08), background_color=(0, 0.5, 0, 1))
+            btn.bind(on_press=self.jalankan_tugas)
+            layout.add_widget(btn)
+            
+            self.output = TextInput(text='Sistem Siap.', readonly=True, size_hint=(1, 0.4), background_color=(0.05, 0.05, 0.05, 1), foreground_color=(0, 1, 0.2, 1))
+            layout.add_widget(self.output)
+            
+            return layout
+
+        except Exception as e:
+            # JIKA TERJADI CRASH, TAMPILKAN DI LAYAR!
+            error_msg = traceback.format_exc()
+            layout = BoxLayout(orientation='vertical', padding=10)
+            layout.add_widget(Label(text='CRASH REPORT', color=(1, 0, 0, 1), size_hint=(1, 0.1), bold=True))
+            error_box = TextInput(text=error_msg, readonly=True, foreground_color=(1, 0, 0, 1))
+            layout.add_widget(error_box)
+            return layout
+
+    def jalankan_tugas(self, instance):
         self.output.text = 'Processing...'
         def task():
             mode = self.mode.text
@@ -79,7 +79,7 @@ class SovereignApp(App):
                     Clock.schedule_once(lambda dt: setattr(self.output, 'text', f'Payload: {len(hasil)}'))
             except Exception as e:
                 Clock.schedule_once(lambda dt: setattr(self.output, 'text', f'Error: {str(e)}'))
-        threading.Thread(target=task).start()
+        threading.Thread(target=task, daemon=True).start()
 
 if __name__ == '__main__':
     SovereignApp().run()
